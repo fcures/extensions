@@ -35,7 +35,7 @@
       };
     }
 
-    defineBlocks() {
+    Blocks: [
         {
           opcode: "userPull",
           blockType: Scratch.BlockType.REPORTER,
@@ -46,7 +46,7 @@
           },
         },
         {
-          opcode: "projectgrab",
+          opcode: "projectPull",
           blockType: Scratch.BlockType.REPORTER,
           text: Scratch.translate("grab [WHAT] count of project id [WHO]"),
           arguments: {
@@ -54,14 +54,12 @@
             WHO: { type: Scratch.ArgumentType.STRING, defaultValue: "60917032" },
           },
         },
-      ];
+      ],
+    menus: [
+        WHAT5: { acceptReporters: true, items: [{ text: Scratch.translate("follower count"), value: "follower" }] },
     }
 
-    defineMenus() {
-        WHAT5: { acceptReporters: true, items: [{ text: Scratch.translate("follower"), value: "follower" }] },
-    }
-
-    async usergrab(args) {
+    async userPull(args) {
       const jsonData = await fetchData(`https://example.com/api/user/info/${args.WHO}`);
       switch (args.WHAT) {
         case "follower": return jsonData.statistics.followers ?? "";
@@ -70,7 +68,7 @@
       }
     }
 
-    async projectgrab(args) {
+    async projectPull(args) {
       const jsonData = await fetchData(`https://example.com/api/projects/${args.WHO}`);
       switch (args.WHAT) {
         case "love": return jsonData.stats.loves ?? "";
