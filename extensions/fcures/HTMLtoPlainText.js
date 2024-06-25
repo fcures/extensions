@@ -37,7 +37,7 @@
             blockType: Scratch.BlockType.COMMAND,
             text: Scratch.translate("HTML to Plain Text [textToParse]"),
             arguments: {
-              TARGET: {
+              textToParse: {
                 type: Scratch.ArgumentType.STRING,
               },
             },
