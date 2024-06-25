@@ -8,14 +8,14 @@
   "use strict";
 
   if (!Scratch.extensions.unsandboxed) {
-    throw new Error("This Extension must run unsandboxed");
+    throw new Error("This extension must run unsandboxed to run.");
   }
 
-  class nexuskittensgrab {
+  class fcuresScratchPull {
     getInfo() {
       return {
-        id: "nexuskittensgrab",
-        name: Scratch.translate("S-Grab"),
+        id: "fcuresScratchPull",
+        name: Scratch.translate("ScratchPull"),
         color1: "#ECA90B",
         color2: "#EBAF00",
         blocks: [
@@ -364,5 +364,5 @@
       }
     }
   }
-  Scratch.extensions.register(new nexuskittensgrab());
+  Scratch.extensions.register(new fcuresScratchPull());
 })(Scratch);
