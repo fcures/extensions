@@ -1,7 +1,7 @@
 // Name: TurboHookV2
-// ID: sev18TurboHookV2
+// ID: fcuresTurboHookV2
 // Description: Allows you to use webhooks but improves with more options.
-// By: sev18 <https://scratch.mit.edu/users/sev18/> (original by CubesterYT <https://scratch.mit.edu/users/CubesterYT/>)
+// By: fcures <https://scratch.mit.edu/users/sev18/> (original by CubesterYT <https://scratch.mit.edu/users/CubesterYT/>)
 // License: MIT
 
 (function (Scratch) {
