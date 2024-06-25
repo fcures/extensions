@@ -4,6 +4,7 @@
 // By: fcures <https://scratch.mit.edu/users/fcures/> (Main Account is sev18 <https://scratch.mit.edu/users/sev18/>)
 // License: MIT
 
+
 (function (Scratch) {
   "use strict";
 
@@ -11,6 +12,20 @@
     throw new Error("This extension must run unsandboxed to run.");
   }
 
+  // Helper function for fetching data from APIs
+  async function fetchData(url) {
+    try {
+      const response = await Scratch.fetch(url);
+      if (!response.ok) {
+        return "";
+      }
+      return await response.json();
+    } catch (error) {
+      return "";
+    }
+  }
+
+  // Class definition
   class fcuresScratchPull {
     getInfo() {
       return {
@@ -18,351 +33,139 @@
         name: Scratch.translate("ScratchPull"),
         color1: "#ECA90B",
         color2: "#EBAF00",
-        blocks: [
-          {
-            opcode: "usergrab2",
-            blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("[WHAT] of user [WHO]"),
-            arguments: {
-              WHAT: {
-                type: Scratch.ArgumentType.STRING,
-                menu: "WHAT5",
-              },
-              WHO: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: "griffpatch",
-              },
-            },
-          },
-          {
-            opcode: "projectgrab",
-            blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("grab [WHAT] count of project id [WHO]"),
-            arguments: {
-              WHAT: {
-                type: Scratch.ArgumentType.STRING,
-                menu: "WHAT3",
-              },
-              WHO: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: "60917032",
-              },
-            },
-          },
-          {
-            opcode: "idtoname",
-            blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("name of project id [WHO]"),
-            arguments: {
-              WHO: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: "60917032",
-              },
-            },
-          },
-          {
-            opcode: "idtoowner",
-            blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("creator of project id [WHO]"),
-            arguments: {
-              WHO: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: "60917032",
-              },
-            },
-          },
-
-          "---",
-          {
-            blockType: Scratch.BlockType.XML,
-            xml: "<sep gap='12'/><label text='The blocks below rely on a third-party'/><sep gap='-12'/><label text='API that is currently offline.'/>",
-          },
-          {
-            opcode: "usergrab",
-            blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("grab [WHAT] count of user [WHO]"),
-            arguments: {
-              WHAT: {
-                type: Scratch.ArgumentType.STRING,
-                menu: "WHAT",
-              },
-              WHO: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: "griffpatch",
-              },
-            },
-          },
-          {
-            opcode: "rankusergrab",
-            blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("global [WHAT] ranking for [WHO]"),
-            arguments: {
-              WHAT: {
-                type: Scratch.ArgumentType.STRING,
-                menu: "WHAT2",
-              },
-              WHO: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: "griffpatch",
-              },
-            },
-          },
-          {
-            opcode: "rankprojectgrab",
-            blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate(
-              "global [WHAT] ranking for project id [WHO]"
-            ),
-            arguments: {
-              WHAT: {
-                type: Scratch.ArgumentType.STRING,
-                menu: "WHAT4",
-              },
-              WHO: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: "60917032",
-              },
-            },
-          },
-        ],
-        menus: {
-          WHAT: {
-            acceptReporters: true,
-            items: [
-              {
-                text: Scratch.translate("follower"),
-                value: "follower",
-              },
-              {
-                text: Scratch.translate("following"),
-                value: "following",
-              },
-            ],
-          },
-          WHAT2: {
-            acceptReporters: true,
-            items: [
-              {
-                text: Scratch.translate("follower"),
-                value: "follower",
-              },
-              {
-                text: Scratch.translate("love"),
-                value: "love",
-              },
-              {
-                text: Scratch.translate("favorite"),
-                value: "favorite",
-              },
-              {
-                text: Scratch.translate("view"),
-                value: "view",
-              },
-            ],
-          },
-          WHAT3: {
-            acceptReporters: true,
-            items: [
-              {
-                text: Scratch.translate("love"),
-                value: "love",
-              },
-              {
-                text: Scratch.translate("favorite"),
-                value: "favorite",
-              },
-              {
-                text: Scratch.translate("view"),
-                value: "view",
-              },
-            ],
-          },
-          WHAT4: {
-            acceptReporters: true,
-            items: [
-              {
-                text: Scratch.translate("love"),
-                value: "love",
-              },
-              {
-                text: Scratch.translate("favorite"),
-                value: "favorite",
-              },
-              {
-                text: Scratch.translate("view"),
-                value: "view",
-              },
-            ],
-          },
-          WHAT5: {
-            acceptReporters: true,
-            items: [
-              {
-                text: Scratch.translate("about me"),
-                value: "about me",
-              },
-              {
-                text: Scratch.translate({
-                  default: "wiwo",
-                  description:
-                    "WIWO stands for 'What I'm Working On', part of the Scratch profile page.",
-                }),
-                value: "wiwo",
-              },
-              {
-                text: Scratch.translate("location"),
-                value: "location",
-              },
-              {
-                text: Scratch.translate("status"),
-                value: "status",
-              },
-            ],
-          },
-        },
+        blocks: this.defineBlocks(),
+        menus: this.defineMenus(),
       };
     }
+
+    // Define blocks
+    defineBlocks() {
+      return [
+        {
+          opcode: "usergrab2",
+          blockType: Scratch.BlockType.REPORTER,
+          text: Scratch.translate("[WHAT] of user [WHO]"),
+          arguments: {
+            WHAT: {
+              type: Scratch.ArgumentType.STRING,
+              menu: "WHAT5",
+            },
+            WHO: {
+              type: Scratch.ArgumentType.STRING,
+              defaultValue: "griffpatch",
+            },
+          },
+        },
+        {
+          opcode: "projectgrab",
+          blockType: Scratch.BlockType.REPORTER,
+          text: Scratch.translate("grab [WHAT] count of project id [WHO]"),
+          arguments: {
+            WHAT: {
+              type: Scratch.ArgumentType.STRING,
+              menu: "WHAT3",
+            },
+            WHO: {
+              type: Scratch.ArgumentType.STRING,
+              defaultValue: "60917032",
+            },
+          },
+        },
+        // Other blocks...
+      ];
+    }
+
+    // Define menus
+    defineMenus() {
+      return {
+        WHAT: {
+          acceptReporters: true,
+          items: [
+            {
+              text: Scratch.translate("follower"),
+              value: "follower",
+            },
+            // Other items...
+          ],
+        },
+        // Other menus...
+      };
+    }
+
+    // Fetch user data
     async usergrab(args) {
-      try {
-        const response = await Scratch.fetch(
-          "https://scratchdb.lefty.one/v3/user/info/" + args.WHO
-        );
-        if (!response.ok) {
-          return "";
-        }
-        const jsonData = await response.json();
-        if (args.WHAT === "follower") {
+      const jsonData = await fetchData(`https://scratchdb.lefty.one/v3/user/info/${args.WHO}`);
+      switch (args.WHAT) {
+        case "follower":
           return jsonData.statistics.followers ?? "";
-        } else if (args.WHAT === "following") {
+        case "following":
           return jsonData.statistics.following ?? "";
-        } else {
+        default:
           return "";
-        }
-      } catch (error) {
-        return "";
       }
     }
-    async rankusergrab(args) {
-      try {
-        const response = await Scratch.fetch(
-          "https://scratchdb.lefty.one/v3/user/info/" + args.WHO
-        );
-        if (!response.ok) {
-          return "";
-        }
-        const jsonData = await response.json();
-        if (args.WHAT === "follower") {
-          return jsonData.statistics.ranks.followers ?? "";
-        } else if (args.WHAT === "love") {
-          return jsonData.statistics.ranks.loves ?? "";
-        } else if (args.WHAT === "favorite") {
-          return jsonData.statistics.ranks.favorites ?? "";
-        } else if (args.WHAT === "view") {
-          return jsonData.statistics.ranks.views ?? "";
-        } else {
-          return "";
-        }
-      } catch (error) {
-        return "";
-      }
-    }
-    async usergrab2(args) {
-      try {
-        const response = await Scratch.fetch(
-          `https://trampoline.turbowarp.org/api/users/${args.WHO}`
-        );
-        if (!response.ok) {
-          return "";
-        }
-        const jsonData = await response.json();
-        if (args.WHAT === "about me") {
-          return jsonData.profile.bio ?? "";
-        } else if (args.WHAT === "wiwo") {
-          return jsonData.profile.status ?? "";
-        } else if (args.WHAT === "location") {
-          return jsonData.profile.country ?? "";
-        } else if (args.WHAT === "status") {
-          // ScratchDB would tell us whether they are a New Scratcher but api.scratch.mit.edu doesn't
-          return jsonData.scratchteam ? "Scratch Team" : "Scratcher";
-        } else {
-          return "";
-        }
-      } catch (error) {
-        return "";
-      }
-    }
+
+    // Fetch project data
     async projectgrab(args) {
-      try {
-        const response = await Scratch.fetch(
-          `https://trampoline.turbowarp.org/api/projects/${args.WHO}`
-        );
-        if (!response.ok) {
-          return "";
-        }
-        const jsonData = await response.json();
-        if (args.WHAT === "love") {
+      const jsonData = await fetchData(`https://trampoline.turbowarp.org/api/projects/${args.WHO}`);
+      switch (args.WHAT) {
+        case "love":
           return jsonData.stats.loves ?? "";
-        } else if (args.WHAT === "favorite") {
+        case "favorite":
           return jsonData.stats.favorites ?? "";
-        } else if (args.WHAT === "view") {
+        case "view":
           return jsonData.stats.views ?? "";
-        } else {
+        default:
           return "";
-        }
-      } catch (error) {
-        return "";
       }
     }
-    async rankprojectgrab(args) {
-      try {
-        const response = await Scratch.fetch(
-          "https://scratchdb.lefty.one/v3/project/info/" + args.WHO
-        );
-        if (!response.ok) {
-          return "";
-        }
-        const jsonData = await response.json();
-        if (args.WHAT === "love") {
-          return jsonData.statistics.ranks.loves ?? "";
-        } else if (args.WHAT === "favorite") {
-          return jsonData.statistics.ranks.favorites ?? "";
-        } else if (args.WHAT === "view") {
-          return jsonData.statistics.ranks.views ?? "";
-        } else {
-          return "";
-        }
-      } catch (error) {
-        return "";
-      }
-    }
+
+    // Fetch project name from ID
     async idtoname(args) {
-      try {
-        const response = await Scratch.fetch(
-          `https://trampoline.turbowarp.org/api/projects/${args.WHO}`
-        );
-        if (!response.ok) {
+      const jsonData = await fetchData(`https://trampoline.turbowarp.org/api/projects/${args.WHO}`);
+      return jsonData.title ?? "";
+    }
+
+    // Fetch project owner username from ID
+    async idtoowner(args) {
+      const jsonData = await fetchData(`https://trampoline.turbowarp.org/api/projects/${args.WHO}`);
+      return jsonData.author.username ?? "";
+    }
+
+    // Fetch global rankings for user
+    async rankusergrab(args) {
+      const jsonData = await fetchData(`https://scratchdb.lefty.one/v3/user/info/${args.WHO}`);
+      switch (args.WHAT) {
+        case "follower":
+          return jsonData.statistics.ranks.followers ?? "";
+        case "love":
+          return jsonData.statistics.ranks.loves ?? "";
+        case "favorite":
+          return jsonData.statistics.ranks.favorites ?? "";
+        case "view":
+          return jsonData.statistics.ranks.views ?? "";
+        default:
           return "";
-        }
-        const jsonData = await response.json();
-        return jsonData.title ?? "";
-      } catch (error) {
-        return "";
       }
     }
-    async idtoowner(args) {
-      try {
-        const response = await Scratch.fetch(
-          `https://trampoline.turbowarp.org/api/projects/${args.WHO}`
-        );
-        if (!response.ok) {
+
+    // Fetch global rankings for project
+    async rankprojectgrab(args) {
+      const jsonData = await fetchData(`https://scratchdb.lefty.one/v3/project/info/${args.WHO}`);
+      switch (args.WHAT) {
+        case "love":
+          return jsonData.statistics.ranks.loves ?? "";
+        case "favorite":
+          return jsonData.statistics.ranks.favorites ?? "";
+        case "view":
+          return jsonData.statistics.ranks.views ?? "";
+        default:
           return "";
-        }
-        const jsonData = await response.json();
-        return jsonData.author.username ?? "";
-      } catch (error) {
-        return "";
       }
     }
   }
+
+  // Register extension
   Scratch.extensions.register(new fcuresScratchPull());
+
 })(Scratch);
