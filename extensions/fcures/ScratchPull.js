@@ -9,7 +9,7 @@
   "use strict";
 
   if (!Scratch.extensions.unsandboxed) {
-    throw new Error("This extension must run unsandboxed to run.");
+    throw new Error("This extension must be unsandboxed to run.");
   }
 
   async function fetchData(url) {
