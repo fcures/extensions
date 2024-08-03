@@ -1,4 +1,4 @@
-# TurboWarp Extension Gallery
+# TurboWarp Extension Gallery V1.1
 
 User-contributed unsandboxed extension gallery for TurboWarp.
 
